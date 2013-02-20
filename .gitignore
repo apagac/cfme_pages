@@ -36,3 +36,5 @@ nosetests.xml
 
 # VIM temp files
 *.swp
+
+.settings
