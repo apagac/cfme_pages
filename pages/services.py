@@ -44,6 +44,11 @@ class Services(Base):
             return HistoryButtons(self.testsetup)
         
         @property
+        def search(self):
+            from pages.regions.search import Search
+            return Search(self.testsetup)
+        
+        @property
         def _power_button(self):
             from pages.regions.taskbar.power import PowerButton
             return PowerButton(self.testsetup)
