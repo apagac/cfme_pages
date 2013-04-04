@@ -2,6 +2,7 @@
 from pages.page import Page
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.select import Select
 
 class Paginator(Page):
     '''Add this region to your page with a property called paginator
@@ -18,6 +19,7 @@ class Paginator(Page):
     _prev_locator = (By.CSS_SELECTOR, "#paging_div * img[alt='Previous']")
     _next_locator = (By.CSS_SELECTOR, "#paging_div * img[alt='Next']")
     _last_page_locator = (By.CSS_SELECTOR, "#paging_div * img[alt='Last']")
+    _per_page_locator = (By.CSS_SELECTOR, "#paging_div * select[name='ppsetting']")
 
     #Position
     _position_text_locator = (By.CSS_SELECTOR, '#paging_div > #pc_div_1 > table > tbody > tr > td > table > tbody > tr > td:last-child')
@@ -53,6 +55,14 @@ class Paginator(Page):
     @property
     def is_last_page_disabled(self):
         return 'dimmed' in self.selenium.find_element(*self._last_page_locator).get_attribute('class')
+
+    @property
+    def selected_per_page(self):
+        return Select(self.selenium.find_element(*self._per_page_locator)).first_selected_option
+
+    def set_per_page(self, value):
+        Select(self.selenium.find_element(*self._per_page_locator)).select_by_value(value)
+        self._wait_for_results_refresh()
 
 class PaginatorMixin(object):
     @property
