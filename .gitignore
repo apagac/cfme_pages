@@ -40,4 +40,6 @@ results
 *.swp
 
 .settings
+pytest.ini
+mozwebqa.cfg
 
