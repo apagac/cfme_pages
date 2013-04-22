@@ -8,6 +8,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
 
+
 class Page(object):
     '''
     Base class for all Pages
@@ -80,4 +81,5 @@ class Page(object):
 
     def select_dropdown(self, value, *element):
         select = Select(self.selenium.find_element(*element))
-        select.select_by_visible_text(value) 
+        select.select_by_visible_text(value)
+
