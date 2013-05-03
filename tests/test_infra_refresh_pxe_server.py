@@ -38,6 +38,8 @@ class TestInfrastructureRefreshPXEServer:
 
         Assert.true(pxe_pg.flash.message == flash_message, "Flash message: %s" % pxe_pg.flash.message)
 
+        pxe_image_names = -1
+
         for i in range(1, 8):
             try:
                 #To refresh the page
@@ -51,6 +53,9 @@ class TestInfrastructureRefreshPXEServer:
                 pass
             else:
                 break
+
+        if pxe_image_names == -1:
+            Assert.true(2 == 3, "Could not assert for expected names.")
 
         for name in EXPECTED_NAMES:
             Assert.true(name in pxe_image_names, "This image has not been found: '%s'" % name)
