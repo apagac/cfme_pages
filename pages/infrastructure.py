@@ -398,6 +398,7 @@ class Infrastructure(Base):
         _page_title = 'CloudForms Management Engine: PXE'
 
         _copy_template_locator = (By.CSS_SELECTOR, "tr.tr_btn[title='Copy this Customization Template']")
+        _add_iso_datastore_locator = (By.CSS_SELECTOR, "tr.tr_btn[title='Add a New ISO Datastore']")
         _refresh_locator = (By.CSS_SELECTOR, "tr.tr_btn[title='Refresh this PXE Server']")
         _pxe_image_names_locator = (By.CSS_SELECTOR, "div#pxe_info_div > fieldset > table[class='style3'] > tbody")
 
@@ -427,6 +428,11 @@ class Infrastructure(Base):
         def click_on_refresh(self):
             self.selenium.find_element(*self._refresh_locator).click()
 
+        def click_on_add_iso_datastore(self):
+            self.selenium.find_element(*self._add_iso_datastore_locator).click()
+            self._wait_for_results_refresh()
+            return Infrastructure.PXEAddISODatastore(self.testsetup)
+
         def pxe_image_names(self):
             element_text = self.selenium.find_element(*self._pxe_image_names_locator).text
             lines = element_text.split('\n')
@@ -435,6 +441,25 @@ class Infrastructure(Base):
                 name, space, test = line.partition(' ')
                 names.append(name)
             return names
+
+    class PXEAddISODatastore(Base):
+
+        _management_system_locator = (By.CSS_SELECTOR, "select#ems_id")
+        _add_button_locator = (By.CSS_SELECTOR, "div#buttons_on > ul > li > img[alt='Add']")
+        _datastore_name_locator = (By.CSS_SELECTOR, "table[class='style3'] > tbody")
+
+        def select_management_system(self, name):
+            self.select_dropdown(name, *self._management_system_locator)
+            self._wait_for_results_refresh()
+
+        def click_on_add(self):
+            self.selenium.find_element(*self._add_button_locator).click()
+            self._wait_for_results_refresh()
+            return Infrastructure.PXEAdded(self.testsetup)
+
+        def datastore_name(self):
+            element_text = self.selenium.find_element(*self._datastore_name_locator).text
+            return element_text
 
     class PXECopyTemplate(Base):
 
@@ -457,8 +482,12 @@ class Infrastructure(Base):
             return Infrastructure.PXEAdded(self.testsetup)
 
     class PXEAdded(Base):
-        #no new methods here
-        pass
+
+        _datastore_name_locator = (By.CSS_SELECTOR, "table[class='style3'] > tbody")
+
+        def datastore_name(self):
+            element_text = self.selenium.find_element(*self._datastore_name_locator).text
+            return element_text
 
     class PXEAddServer(Base):
 
