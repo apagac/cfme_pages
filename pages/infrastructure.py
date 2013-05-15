@@ -470,8 +470,12 @@ class Infrastructure(Base):
             self._wait_for_visible_element(*self._pxe_uri_locator)
             return Infrastructure.PXE(self.testsetup)
 
+        #TODO empty depot_type parameter needed to successfuly run this function from a test
+        #this is because we have all the data in cfme_data file
+        #depot type needs to be set up separatelly, but also needs to be here
         def new_pxe_server_fill_data(
                                      self,
+                                     depot_type = "",
                                      name="pxe_server",
                                      uri="127.0.0.1/var/www/html/pub/miq/ipxe/",
                                      access_url="http://127.0.0.1/ipxe",
