@@ -6,24 +6,26 @@ from pages.regions.paginator import PaginatorMixin
 from selenium.webdriver.common.action_chains import ActionChains
 from pages.regions.quadicons import Quadicons
 from pages.regions.quadiconitem import QuadiconItem
+from pages.regions.policy_menu import PolicyMenu
 import re
 
 class Infrastructure(Base):
     @property
     def submenus(self):
         return {"management_system" : Infrastructure.ManagementSystems,
+                "ems_cluster"       : Infrastructure.Clusters,
                 "host"              : Infrastructure.Hosts,
+                "storage"           : Infrastructure.Datastores,
                 "pxe"               : Infrastructure.PXE
                 }
         
-    class ManagementSystems(Base, PaginatorMixin):
+    class ManagementSystems(Base, PaginatorMixin, PolicyMenu):
         _page_title = 'CloudForms Management Engine: Management Systems'
         _configuration_button_locator = (By.CSS_SELECTOR, "div.dhx_toolbar_btn[title='Configuration']")
         _discover_management_systems_locator = (By.CSS_SELECTOR, "table.buttons_cont tr[title='Discover Management Systems']")
         _edit_management_systems_locator = (By.CSS_SELECTOR, "table.buttons_cont tr[title='Select a single Management System to edit']")
         _remove_management_systems_locator = (By.CSS_SELECTOR, "table.buttons_cont tr[title='Remove selected Management Systems from the VMDB']")
         _add_new_management_system_locator = (By.CSS_SELECTOR, "table.buttons_cont tr[title='Add a New Management System']")
-
 
         @property
         def quadicon_region(self):
@@ -350,7 +352,60 @@ class Infrastructure(Base):
             return Infrastructure.ManagementSystemsAdd(self.testsetup)
 
 
-    class Hosts(Base):
+    class Clusters(Base, PolicyMenu):
+        _page_title = 'CloudForms Management Engine: Clusters'
+
+        @property
+        def icon(self):
+            return Quadicons(self.testsetup)
+
+        @property
+        def accordion_region(self):
+            from pages.regions.accordion import Accordion
+            from pages.regions.treeaccordionitem import TreeAccordionItem
+            return Accordion(self.testsetup, TreeAccordionItem)
+
+        def select_cluster(self, cluster_name):
+            self.icon.get_quadicon_by_title(cluster_name).mark_checkbox()
+
+        def click_cluster(self, cluster_name):
+            self.icon.get_quadicon_by_title(cluster_name).click()
+            self._wait_for_results_refresh()
+            return Infrastructure.ClustersDetail(self.testsetup)
+
+        @property
+        def taskbar(self):
+            from pages.regions.taskbar.taskbar import Taskbar
+            return Taskbar(self.testsetup)
+
+    class ClustersDetail(Base, PolicyMenu):
+        _page_title = 'CloudForms Management Engine: Clusters'
+        _cluster_detail_name_locator = (By.XPATH, '//*[@id="accordion"]/div[1]/div[1]/a')
+        _details_locator = (By.CSS_SELECTOR, "div#textual_div")
+
+        @property
+        def details(self):
+            from pages.regions.details import Details
+            root_element = self.selenium.find_element(*self._details_locator)
+            return Details(self.testsetup, root_element)
+
+        @property
+        def name(self):
+            return self.selenium.find_element(*self._cluster_detail_name_locator).text.encode('utf-8')
+
+        @property
+        def management_system(self):
+            return self.details.get_section("Relationships").get_item("Management System").value
+
+        @property
+        def datacenter(self):
+            return self.details.get_section("Relationships").get_item("Datacenter").value
+
+        @property
+        def host_count(self):
+            return self.details.get_section("Relationships").get_item("Hosts").value
+
+    class Hosts(Base, PolicyMenu):
         _page_title = 'CloudForms Management Engine: Hosts'
 
         @property
@@ -362,6 +417,9 @@ class Infrastructure(Base):
             from pages.regions.accordion import Accordion
             from pages.regions.treeaccordionitem import TreeAccordionItem
             return Accordion(self.testsetup, TreeAccordionItem)
+
+        def select_host(self, host_name):
+            self.quadicon_region.get_quadicon_by_title(host_name).mark_checkbox()
 
         @property
         def taskbar(self):
@@ -393,6 +451,60 @@ class Infrastructure(Base):
             #    self._wait_for_results_refresh()
             #    return Infrastructure.HostsDetail(self.testsetup)
 
+    class Datastores(Base, PolicyMenu):
+        _page_title = 'CloudForms Management Engine: Datastores'
+
+        @property
+        def quadicon_region(self):
+            return Quadicons(self.testsetup,Infrastructure.Datastores.DatastoreQuadIconItem)
+
+        @property
+        def accordion_region(self):
+            from pages.regions.accordion import Accordion
+            from pages.regions.treeaccordionitem import TreeAccordionItem
+            return Accordion(self.testsetup, TreeAccordionItem)
+
+        def select_datastore(self, datastore_name):
+            self.quadicon_region.get_quadicon_by_title(datastore_name).mark_checkbox()
+
+        def click_datastore(self, datastore_name):
+            self.quadicon_region.get_quadicon_by_title(datastore_name).click()
+            self._wait_for_results_refresh()
+            return Infrastructure.DatastoresDetail(self.testsetup)
+
+        @property
+        def taskbar(self):
+            from pages.regions.taskbar.taskbar import Taskbar
+            return Taskbar(self.testsetup)
+
+        class DatastoreQuadIconItem(QuadiconItem):
+
+            @property
+            def vm_count(self):
+                return self._root_element.find_element(*self._quad_tr_locator).text
+
+            @property
+            def host_count(self):
+                return self._root_element.find_element(*self._quad_bl_locator).text
+
+    class DatastoresDetail(Base, PolicyMenu):
+        _page_title = 'CloudForms Management Engine: Datastores'
+        _datastore_detail_name_locator = (By.XPATH, '//*[@id="accordion"]/div[1]/div[1]/a')
+        _details_locator = (By.CSS_SELECTOR, "div#textual_div")
+
+        @property
+        def details(self):
+            from pages.regions.details import Details
+            root_element = self.selenium.find_element(*self._details_locator)
+            return Details(self.testsetup, root_element)
+
+        @property
+        def name(self):
+            return self.selenium.find_element(*self._datastore_detail_name_locator).text.encode('utf-8')
+
+        @property
+        def ds_type(self):
+            return self.details.get_section("Properties").get_item("Datastore Type").value
 
     class PXE(Base):
         _page_title = 'CloudForms Management Engine: PXE'
