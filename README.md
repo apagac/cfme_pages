@@ -63,6 +63,8 @@ Setup:
 5. Install all required additional software.
    * List of required items is here: cfme_pages/requirements.txt
    * pip install -Ur cfme_pages/requirements.txt
+   * pip install -Ur cfme_tests/requirements.txt (check for error output)
+       + you may need to 'yum install libxslt-devel libxml2-devel' before hand 
 6. Install chromedriver (or you could just use firefox instead - replace "--driver=chrome" with "--driver=firefox" in pytest.ini).
    * Download latest available for your arch from here: http://code.google.com/p/chromedriver/downloads/list
    * Unzip the file to somewhere on your path (for example to '/usr/bin/chromedriver')
