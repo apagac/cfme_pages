@@ -2,6 +2,7 @@ import pytest
 from unittestzero import Assert
 from selenium.webdriver.common.by import By
 
+@pytest.mark.usefixtures("maximized")
 class TestSearch:        
         
     @pytest.mark.nondestructive

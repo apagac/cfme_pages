@@ -6,6 +6,7 @@ import pytest
 import time
 from unittestzero import Assert
 
+@pytest.mark.usefixtures("maximized")
 @pytest.mark.nondestructive
 class TestSmartProxies:
     def test_smartproxies(self, mozwebqa, home_page_logged_in):

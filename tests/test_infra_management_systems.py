@@ -8,6 +8,7 @@ from unittestzero import Assert
 
 NAME = "test_name_2"
 
+@pytest.mark.usefixtures("maximized")
 @pytest.mark.nondestructive #IGNORE:E1101
 class TestManagementSystems:
     def test_management_systems(self, mozwebqa, home_page_logged_in):

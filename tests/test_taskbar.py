@@ -9,6 +9,7 @@ import time
 from unittestzero import Assert
 
 
+@pytest.mark.usefixtures("maximized")
 class TestTaskbar:        
     @pytest.mark.nondestructive
     def test_history_buttons(self, mozwebqa, home_page_logged_in):
@@ -18,10 +19,11 @@ class TestTaskbar:
         time.sleep(5)
         
     @pytest.mark.nondestructive
-    def test_view_buttons(self,mozwebqa, home_page_logged_in, maximized):
+    def test_view_buttons(self,mozwebqa, home_page_logged_in):
         '''Note the use of maximized here. Currently, if the browser is too narrow,
         the view buttons are obscured by the search box. The maximized figure just 
         maximizes the browser window.
+        Update: 'maximized' moved to fixture
         '''
         vm_pg = home_page_logged_in.header.site_navigation_menu("Services").sub_navigation_menu("Virtual Machines").click()
         view_buttons = vm_pg.view_buttons

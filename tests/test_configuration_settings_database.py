@@ -6,6 +6,7 @@ import pytest
 import time
 from unittestzero import Assert
 
+@pytest.mark.usefixtures("maximized")
 @pytest.mark.nondestructive
 class TestConfigurationSettingsDatabase:
     def test_change_database_settings(self, mozwebqa, home_page_logged_in):

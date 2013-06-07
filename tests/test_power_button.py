@@ -7,6 +7,7 @@ def pick_random_vm_template(mozwebqa, home_page_logged_in):
     vm_pg.find_vm_page(None,'template',True, False)
     return vm_pg
 
+@pytest.mark.usefixtures("maximized")
 @pytest.mark.nondestructive
 class TestPowerButton:        
         

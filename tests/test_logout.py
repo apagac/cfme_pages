@@ -7,6 +7,7 @@ Created on Mar 5, 2013
 import pytest
 from unittestzero import Assert
 
+@pytest.mark.usefixtures("maximized")
 class TestLogout:
     @pytest.mark.nondestructive
     def test_logout(self, mozwebqa, home_page_logged_in):

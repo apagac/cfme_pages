@@ -6,6 +6,7 @@ import pytest
 import time
 from unittestzero import Assert
 
+@pytest.mark.usefixtures("maximized")
 @pytest.mark.nondestructive
 class TestConfigurationSettingsZones:
     def test_add_new_zone(self, mozwebqa, home_page_logged_in):

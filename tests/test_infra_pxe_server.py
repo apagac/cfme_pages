@@ -8,6 +8,7 @@ from unittestzero import Assert
 
 NAME = "rhel_pxe_server"
 
+@pytest.mark.usefixtures("maximized")
 @pytest.mark.nondestructive  # IGNORE:E1101
 class TestPXEServer:
     def test_pxe_server(self, mozwebqa, home_page_logged_in):

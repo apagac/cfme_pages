@@ -11,6 +11,7 @@ def pick_random_vm(mozwebqa, home_page_logged_in):
     return vm_details
 
 
+@pytest.mark.usefixtures("maximized")
 @pytest.mark.nondestructive
 class TestServices:
     def test_virtual_machines(self, mozwebqa, home_page_logged_in):

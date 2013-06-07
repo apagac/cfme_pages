@@ -6,6 +6,7 @@ import pytest
 import time
 from unittestzero import Assert
 
+@pytest.mark.usefixtures("maximized")
 @pytest.mark.nondestructive #IGNORE:E1101
 class TestDatastore:
     def test_datastore(self, mozwebqa, home_page_logged_in):

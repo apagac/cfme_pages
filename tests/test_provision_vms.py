@@ -14,6 +14,7 @@ from unittestzero import Assert
 def vm_page(request,mozwebqa,home_page_logged_in):
     return home_page_logged_in.header.site_navigation_menu("Services").sub_navigation_menu("Virtual Machines").click()
 
+@pytest.mark.usefixtures("maximized")
 @pytest.mark.nondestructive  # IGNORE:E1101
 class TestProvisionVms:
     def test_provision_start(self, vm_page):
