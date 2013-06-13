@@ -3,6 +3,7 @@ from pages.page import Page
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.select import Select
+import re
 
 class Paginator(Page):
     '''Add this region to your page with a property called paginator
@@ -27,7 +28,11 @@ class Paginator(Page):
 
     #Position
     _position_text_locator = (By.CSS_SELECTOR, '#pc_div_1 > table > tbody > tr > td > table > tbody > tr > td:last-child')
+    _position_regex = '(\d+)[-]?(\d+)? of (\d+)\)'
     
+    # Selection
+    _select_all_checkbox_locator = (By.ID, "masterToggle")
+
     def click_first_page(self):
         self.selenium.find_element(*self._first_page_locator).click()
         self._wait_for_results_refresh()
@@ -67,6 +72,44 @@ class Paginator(Page):
     def set_per_page(self, value):
         Select(self.selenium.find_element(*self._per_page_locator)).select_by_value(value)
         self._wait_for_results_refresh()
+
+    @property
+    def select_all_checkbox(self):
+        return self.get_element(*self._select_all_checkbox_locator)
+
+    def select_all(self):
+        if not self.select_all_checkbox.is_selected():
+            self.select_all_checkbox.click()
+
+    def deselect_all(self):
+        if self.select_all_checkbox.is_selected():
+            self.select_all_checkbox.click()
+
+    @property
+    def is_visible(self):
+        return self.get_element(*self._first_page_locator).is_displayed()
+
+    @property
+    def position_text(self):
+        return self.get_element(*self._position_text_locator)
+
+    @property
+    def _position_fields(self):
+        position_value = self.position_text.text
+        results = re.search(self._position_regex, position_value)
+        return results.groups()
+
+    @property
+    def position_start(self):
+        return self._position_fields[0]
+
+    @property
+    def position_end(self):
+        return self._position_fields[1]
+
+    @property
+    def position_total(self):
+        return self._position_fields[2]
 
 class PaginatorMixin(object):
     @property
