@@ -52,14 +52,14 @@ Setup:
    * mv pytest.ini.template pytest.ini
 3. Edit both files to reflect your environment.
    * In credentials.yaml:
-   * username: Your username, used to log in into cfme.
-   * password: Your password, used to log in into cfme.
+      + username: Your username, used to log in into cfme.
+      + password: Your password, used to log in into cfme.
    * In mozwebqa.cfg:
-   * baseurl: Url, where to find running version of cfme.
+      + baseurl: Url, where to find running version of cfme.
 4. Create a virtualenv to run pytest from
    * easy_install virtualenv (yum install python-virtualenv also works for those preferring rpm)
-   * virtualenv <name>
-   * source <name>/bin/activate 
+   * virtualenv [name]
+   * source [name]/bin/activate 
 5. Install all required additional software.
    * List of required items is here: cfme_pages/requirements.txt
    * pip install -Ur cfme_pages/requirements.txt
@@ -69,8 +69,9 @@ Setup:
    * Download latest available for your arch from here: http://code.google.com/p/chromedriver/downloads/list
    * Unzip the file to somewhere on your path (for example to '/usr/bin/chromedriver')
 7. Run the tests.
-   * PYTHONPATH=cfme_pages/ py.test
-8. TIP: to run specific test, add to this command '-k <StringInTestName>'
+   * cd cfme_pages/
+   * py.test
+8. TIP: to run specific test, add to this command '-k StringInTestName'
 
 Reminders:
 
