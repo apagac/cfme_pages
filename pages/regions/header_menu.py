@@ -12,6 +12,7 @@ from pages.services import Services
 from pages.automate import Automate
 from pages.control import Control
 from pages.configuration import Configuration
+from pages.configuration_subpages.tasks_tabs import Tasks
 from pages.virtual_intelligence import VirtualIntelligence
 from pages.infrastructure_subpages.management_systems import ManagementSystems
 from pages.optimize import Optimize
@@ -101,7 +102,7 @@ class HeaderMenu(Page):
                                    "Customization": Automate.Customization},
                       "Configuration": {"Configuration": Configuration.Configuration,
                                         "My Settings": Configuration.MySettings,
-                                        "Tasks": Configuration.Tasks,
+                                        "Tasks": Tasks.MyVmAnalysisTasks,
                                         "SmartProxies": Configuration.SmartProxies,
                                         "About": Configuration.About},
                       "Optimize": {"Utilization": Optimize.Utilization},
