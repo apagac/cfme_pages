@@ -3,8 +3,10 @@ import pytest
 import time
 from unittestzero import Assert
 
+#TODO check for generic names, not these
 @pytest.mark.nondestructive
-@pytest.mark.usefixtures("maximized")
+#@pytest.mark.usefixtures("maximized")
+@pytest.mark.usefixtures("maximized", "db_setup_for_test_configuration_settings_region")
 class TestConfigurationSettingsRegion:
     def test_cap_and_util_all_clusters(self, mozwebqa, home_page_logged_in):
         home_pg = home_page_logged_in
@@ -37,9 +39,9 @@ class TestConfigurationSettingsRegion:
         cap_and_util_pg = config_pg.click_on_settings().click_on_first_region().click_on_cap_and_util()
         cap_and_util_pg.uncheck_all_clusters()
         Assert.true(cap_and_util_pg.check_all_clusters_checkbox.get_attribute("checked") != "true")
-        cap_and_util_pg.check_specific_cluster("Default")
-        cap_and_util_pg.uncheck_specific_cluster("Default")
-        cap_and_util_pg.check_specific_cluster("qeblade21asdasd")
+        cap_and_util_pg.check_specific_cluster("scripted_cluster")
+        #cap_and_util_pg.uncheck_specific_cluster("scripted_cluster")
+        #cap_and_util_pg.check_specific_cluster("qeblade21asdasd")
         cap_and_util_pg.click_on_reset()
         Assert.true(cap_and_util_pg.flash.message.startswith("All changes have been reset"))
 
@@ -74,9 +76,9 @@ class TestConfigurationSettingsRegion:
         cap_and_util_pg = config_pg.click_on_settings().click_on_first_region().click_on_cap_and_util()
         cap_and_util_pg.uncheck_all_datastores()
         Assert.true(cap_and_util_pg.check_all_datastores_checkbox.get_attribute("checked") != "true")
-        cap_and_util_pg.check_specific_datastore("datastore1 [50328aff-adaef710-7a6c-5cf3fc1c8656]")
-        cap_and_util_pg.uncheck_specific_datastore("datastore1 [50328aff-adaef710-7a6c-5cf3fc1c8656]")
-        cap_and_util_pg.check_specific_datastore("iso [qeblade21.rhq.lab.eng.bos.redhat.com:/home/rhev/iso]")
+        cap_and_util_pg.check_specific_datastore("scripted_datastore [somewhere]")
+        #cap_and_util_pg.uncheck_specific_datastore("scripted_datastore")
+        #cap_and_util_pg.check_specific_datastore("iso [qeblade21.rhq.lab.eng.bos.redhat.com:/home/rhev/iso]")
         cap_and_util_pg.click_on_reset()
         Assert.true(cap_and_util_pg.flash.message.startswith("All changes have been reset"))
 

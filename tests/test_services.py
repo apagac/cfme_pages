@@ -12,7 +12,8 @@ def pick_random_vm(mozwebqa, home_page_logged_in):
 
 
 @pytest.mark.nondestructive
-@pytest.mark.usefixtures("maximized") 
+#@pytest.mark.usefixtures("maximized") 
+@pytest.mark.usefixtures("db_setup_for_test_infrastructure_clusters", "maximized") 
 class TestServices:
  #    def test_virtual_machines(self, mozwebqa, home_page_logged_in):
 #        home_pg = home_page_logged_in
@@ -64,7 +65,6 @@ class TestServices:
         vm_name = vm_pg.details.get_section("Properties").get_item("Name").value
         vm_pg.click_on_immediately_retire_vm(cancel=True)
         Assert.true(vm_pg.details.get_section("Properties").get_item("Name").value == vm_name)        
-
 
     def test_vm_util(self, mozwebqa, home_page_logged_in, pick_random_vm):
         home_pg = home_page_logged_in

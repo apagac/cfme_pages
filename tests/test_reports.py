@@ -12,7 +12,8 @@ import os
 class TestReports:
     def test_import_reports(self, mozwebqa, home_page_logged_in):
         report_file = "sample_reports.yaml"
-        reports = "%s/tests/%s" % (os.getcwd(), report_file)
+        #reports = "%s/tests/%s" % (os.getcwd(), report_file)
+        reports = "%s/cfme_pages/tests/%s" % (os.getcwd(), report_file)
 
         home_pg = home_page_logged_in
         report_pg = home_pg.header.site_navigation_menu("Virtual Intelligence").sub_navigation_menu("Reports").click()

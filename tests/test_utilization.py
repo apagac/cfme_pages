@@ -4,13 +4,14 @@ import datetime
 from unittestzero import Assert
 
 @pytest.mark.nondestructive #IGNORE:E1101
-@pytest.mark.usefixtures("maximized") 
+#@pytest.mark.usefixtures("maximized") 
+@pytest.mark.usefixtures("maximized", "db_setup_for_test_infrastructure_clusters")
 class TestUtilization:
     def test_datastores(self, mozwebqa, home_page_logged_in):
         home_pg = home_page_logged_in
         utilization_pg = home_pg.header.site_navigation_menu("Optimize").sub_navigation_menu("Utilization").click()
         Assert.true(utilization_pg.is_the_current_page)  
-        node_name = "datastore1" 
+        node_name = "scripted_datastore" 
         node_pg = utilization_pg.click_on_node(node_name)        
         summary_pg = node_pg.click_on_summary()
         #Assert.true(summary_pg.tab_buttons.current_tab == "Summary")
@@ -50,7 +51,7 @@ class TestUtilization:
         home_pg = home_page_logged_in
         utilization_pg = home_pg.header.site_navigation_menu("Optimize").sub_navigation_menu("Utilization").click()
         Assert.true(utilization_pg.is_the_current_page)
-        node_name = "RHEV 3.1"
+        node_name = "rhevm-scripted"
         node_pg = utilization_pg.click_on_node(node_name)
         summary_pg = node_pg.click_on_summary()
         #Assert.true(summary_pg.tab_buttons.current_tab == "Summary")

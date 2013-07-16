@@ -8,6 +8,7 @@ def pick_random_vm_template(mozwebqa, home_page_logged_in):
     return vm_pg
 
 @pytest.mark.nondestructive
+@pytest.mark.usefixtures("db_setup_for_test_power_button", "maximized")
 class TestPowerButton:        
         
     def test_power_button_shutdown(self, mozwebqa, home_page_logged_in, pick_random_vm_template):

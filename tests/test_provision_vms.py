@@ -15,6 +15,7 @@ def vm_page(request,mozwebqa,home_page_logged_in):
     return home_page_logged_in.header.site_navigation_menu("Services").sub_navigation_menu("Virtual Machines").click()
 
 @pytest.mark.nondestructive  # IGNORE:E1101
+@pytest.mark.usefixtures("db_setup_for_test_power_button", "maximized")
 class TestProvisionVms:
     def test_provision_start(self, vm_page):
         vm_pg = vm_page

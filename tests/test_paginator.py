@@ -5,6 +5,7 @@ import time
 from unittestzero import Assert
 
 @pytest.mark.nondestructive
+@pytest.mark.usefixtures("db_setup_for_test_paginator", "maximized")
 class TestPaginator:
     def test_paginator(self, mozwebqa, home_page_logged_in):
         home_pg = home_page_logged_in
