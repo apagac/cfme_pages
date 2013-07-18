@@ -24,3 +24,9 @@ class Settings(Base):
         self.accordion.current_content.find_node_by_regexp('\ARegion:').click()
         self._wait_for_results_refresh()
         return RegionSettings(self.testsetup)
+
+    def click_on_zones(self):
+        self.accordion.current_content.find_node_by_regexp(
+                r'\AZones').click()
+        self._wait_for_results_refresh()
+        return ZoneSettings(self.testsetup)
