@@ -83,4 +83,3 @@ class TestServices:
         util_pg.fill_data(interval, show, time_zone, compare_to, date)
         util_pg._wait_for_results_refresh()
         Assert.true(util_pg.date_field.get_attribute("value") == date)
-
