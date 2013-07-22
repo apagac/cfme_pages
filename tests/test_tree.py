@@ -17,7 +17,7 @@ def test_tree(home_page_logged_in):
     Assert.true(vm_pg.is_the_current_page)
     Assert.equal(len(vm_pg.accordion.accordion_items), 3,
             "Should be 3 accordion items")
-    vm_pg.accordion.accordion_by_name('My VMs').click()
+    vm_pg.accordion.accordion_by_name('VMs').click()
     tree = vm_pg.accordion.current_content
     Assert.true(tree.children[0].children[5].name == "Environment / Test")
     did_collapse = tree.children[0].twisty.collapse()

@@ -17,6 +17,7 @@ def test_change_database_settings(home_page_logged_in):
     Assert.true(db_pg.dbtype.get_attribute('value') == 'internal')
     db_pg.set_external_postgres_db('localhost', 'none', 'none', 'none')
     db_pg.validate()
+    db_pg._wait_for_results_refresh()
     Assert.endswith(db_pg.flash.message,
             'password authentication failed for user "none"',
             'Could not validate flash message')

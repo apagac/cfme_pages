@@ -7,6 +7,7 @@ import time
 from unittestzero import Assert
 
 @pytest.mark.nondestructive #IGNORE:E1101
+@pytest.mark.usefixtures("maximized", "db_setup_for_test_infrastructure_datastores")
 class TestDatastore:
     def test_datastore(self, mozwebqa, home_page_logged_in):
         home_pg = home_page_logged_in
@@ -14,7 +15,7 @@ class TestDatastore:
         Assert.true(ds_pg.is_the_current_page)
         for datastore in ds_pg.quadicon_region.quadicons:
             print datastore.title + " VMs: %s, Hosts: %s" % (datastore.vm_count, datastore.host_count)
-        details_pg = ds_pg.click_datastore("datastore1")
+        details_pg = ds_pg.click_datastore("scripted_datastore")
         print details_pg.name, details_pg.ds_type
         time.sleep(1)
         edit_tags_pg = ds_pg.click_on_edit_tags()

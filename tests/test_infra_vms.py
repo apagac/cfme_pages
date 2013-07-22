@@ -16,7 +16,7 @@ def pick_random_vm(home_page_logged_in):
 
 
 @pytest.mark.nondestructive
-@pytest.mark.usefixtures("maximized") 
+@pytest.mark.usefixtures("maximized", "db_setup_for_test_infrastructure_clusters") 
 class TestVirtualMachines:
     def test_quadicon_list(self, home_page_logged_in):
         vm_pg = home_page_logged_in.header.site_navigation_menu(
