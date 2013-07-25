@@ -116,7 +116,7 @@ class Automate(Base):
             return self.selenium.find_element(*self._add_class_button)
 
         @property
-        def return_flash_message(self):
+        def namespace_flash_message_text(self):
             return self.selenium.find_element(*self._flash_message_area).text
 
         def click_on_namespace_access_node(self, node_name):
@@ -130,12 +130,16 @@ class Automate(Base):
             self._wait_for_results_refresh()
             return ExplorerNamespace(self.testsetup)
 
+        def click_on_class_access_node(self, node_name):
+            self.accordion.current_content.find_node_by_name(node_name).click()
+            self._wait_for_results_refresh()
+            return ExplorerClass(self.testsetup)
+
         def click_on_add_new_class(self):
             self._wait_for_results_refresh()
             ActionChains(self.selenium).click(self.configuration_button).click(self.add_class_button).perform()
             self._wait_for_results_refresh()
             return ExplorerClass(self.testsetup)
-
 
     class Customization(Base):
         _page_title = 'CloudForms Management Engine: Customization'
