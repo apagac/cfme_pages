@@ -1,1 +1,1 @@
-pytest_plugins = "plugin.highlight"
+pytest_plugins = "plugin.highlight", "plugin.randomness"

@@ -8,3 +8,9 @@ pytest==2.3.4
 pytest-mozwebqa==1.0
 requests==0.13.3
 selenium
+paramiko
+scp
+suds
+boto
+pysphere
+ovirt-engine-sdk
