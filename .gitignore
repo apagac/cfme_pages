@@ -43,3 +43,4 @@ results
 pytest.ini
 mozwebqa.cfg
 credentials.yaml
+vm.properties
