@@ -2,19 +2,20 @@
 
 from pages.base import Base
 from pages.infrastructure_subpages.providers import Providers
+from pages.infrastructure_subpages.hosts import Hosts
 from pages.infrastructure_subpages.vms_subpages.virtual_machines import VirtualMachines
 from pages.regions.policy_menu import PolicyMenu
 from pages.regions.quadiconitem import QuadiconItem
 from pages.regions.quadicons import Quadicons
 from selenium.webdriver.common.by import By
-import re
+
 
 class Infrastructure(Base):
     @property
     def submenus(self):
         return {"ems_infra"         : Providers,
                 "ems_cluster"       : Infrastructure.Clusters,
-                "host"              : Infrastructure.Hosts,
+                "host"              : Hosts,
                 "storage"           : Infrastructure.Datastores,
                 "pxe"               : Infrastructure.PXE,
                 "vmx"               : VirtualMachines
@@ -78,61 +79,6 @@ class Infrastructure(Base):
             return self.details.get_section("Relationships").get_item(
                     "Hosts").value
 
-    class Hosts(Base, PolicyMenu):
-        _page_title = 'CloudForms Management Engine: Hosts'
-
-        @property
-        def quadicon_region(self):
-            return Quadicons(
-                    self.testsetup, Infrastructure.Hosts.HostQuadIconItem)
-
-        @property
-        def accordion_region(self):
-            from pages.regions.accordion import Accordion
-            from pages.regions.treeaccordionitem import TreeAccordionItem
-            return Accordion(self.testsetup, TreeAccordionItem)
-
-        def select_host(self, host_name):
-            self.quadicon_region.get_quadicon_by_title(
-                    host_name).mark_checkbox()
-
-        @property
-        def taskbar(self):
-            from pages.regions.taskbar.taskbar import Taskbar
-            return Taskbar(self.testsetup)
-
-        class HostQuadIconItem(QuadiconItem):
-            @property
-            def vm_count(self):
-                return self._root_element.find_element(
-                        *self._quad_tl_locator).text
-
-            @property
-            def current_state(self):
-                image_src = self._root_element.find_element(
-                        *self._quad_tr_locator).find_element_by_tag_name(
-                                "img").get_attribute("src")
-                return re.search(r'.+/currentstate-(.+)\.png',
-                        image_src).group(1)
-
-            @property
-            def vendor(self):
-                image_src = self._root_element.find_element(
-                        *self._quad_bl_locator).find_element_by_tag_name(
-                                "img").get_attribute("src")
-                return re.search(r'.+/vendor-(.+)\.png', image_src).group(1)
-
-            @property
-            def valid_credentials(self):
-                image_src = self._root_element.find_element(
-                        *self._quad_br_locator).find_element_by_tag_name(
-                                "img").get_attribute("src")
-                return 'checkmark' in image_src
-
-            # def click(self):
-            #    self._root_element.click()
-            #    self._wait_for_results_refresh()
-            #    return Infrastructure.HostsDetail(self.testsetup)
 
     class Datastores(Base, PolicyMenu):
         _page_title = 'CloudForms Management Engine: Datastores'
