@@ -12,6 +12,7 @@ from pages.configuration_subpages.settings import Settings
 from pages.configuration_subpages.tasks_tabs import Tasks
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
+from pages.configuration_subpages.settings_subpages.region_subpages.redhat_updates import RedhatUpdates
 
 
 class Configuration(Base):
@@ -67,6 +68,11 @@ class Configuration(Base):
                 save_button.click()
             self._wait_for_results_refresh()
             return Settings(self.testsetup)
+
+        def click_on_redhat_updates(self):
+            self.tabbutton_region.tabbutton_by_name("Red Hat Updates").click()
+            self._wait_for_results_refresh()
+            return RedhatUpdates(self.testsetup)
 
     class MySettings(Base):
         _page_title = "CloudForms Management Engine: Configuration"
