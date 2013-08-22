@@ -12,21 +12,44 @@ class RedhatUpdates(Base):
         self.selenium.find_element(*self._http_proxy_locator).click()
         return RedhatUpdates.HTTPProxy(self.testsetup)
 
+    #TODO WARNING: IN DEVELOPMENT
+    #TODO locator definitions missing
+    #not sure if this will work
+    def edit_registration_and_save(self, rh_updates_data):
+        #click on edit registration
+        self.selenium.find_element(*self._edit_registration_button_locator).click()
+        self._wait_for_results_refresh()
+        #register with rhsm
+        self.select_dropdown("Red Hat Subscription Management", \
+            *self._register_with_locator)
+        self._wait_for_results_refresh()
+        #fill data
+        self.selenium.find_element(*self._address_locator).send_keys(
+            rh_updates_data["url"])
+        self.selenium.find_element(*self._login_locator).send_keys(
+            rh_updates_data["credentials"]["username"])
+        self.selenium.find_element(*self._password_locator).send_keys(
+            rh_updates_data["credentials"]["password"])
+        #click on save
+        self.selenium.find_element(*self._save_button_locator).click()
+        self._wait_for_results_refresh()
+        return RedhatUpdates.Registered(self.testsetup)
+
     class HTTPProxy(Base):
         _address_locator = ()
         _user_id_locator = ()
         _password_locator = ()
 
-        def fill_data(self,
-                      address="",
-                      user_id="",
-                      password=""):
+        def fill_data(self, rh_updates_data):
             #address
-            self.selenium.find_element(*self._address_locator).send_keys(address)
+            self.selenium.find_element(*self._address_locator).send_keys(
+                rh_updates_data["http_proxy"]["url"])
             #user id
-            self.selenium.find_element(*self._user_id_locator).send_keys(user_id)
+            self.selenium.find_element(*self._user_id_locator).send_keys(
+                rh_updates_data["http_proxy"]["username"])
             #password
-            self.selenium.find_element(*self._password_locator).send_keys(password)
+            self.selenium.find_element(*self._password_locator).send_keys(
+                rh_updates_data["http_proxy"]["password"])
 
 
     class EditRegistration(Base):
@@ -64,22 +87,23 @@ class RedhatUpdates(Base):
         _cancel_button_locator = ()
         _save_button_locator = ()
 
-        def fill_data(self,
-                      address="",
-                      login="",
-                      password="",
-                      default=False):
+        def fill_data(self, rh_updates_data, default=False):
             if default:
                 #default button
                 self.selenium.find_element(*self._default_button_locator).click()
             else:
                 #address
-                self.selenium.find_element(*self._address_locator).send_keys(address)
+                self.selenium.find_element(*self._address_locator).send_keys(
+                    rh_updates_data["url"])
             #login
-            self.selenium.find_element(*self._login_locator).send_keys(login)
+            self.selenium.find_element(*self._login_locator).send_keys(
+                rh_updates_data["credentials"]["username"])
             #password
-            self.selenium.find_element(*self._password_locator).send_keys(password)
+            self.selenium.find_element(*self._password_locator).send_keys(
+                rh_updates_data["credentials"]["password"])
 
+
+        #TODO return page
         def click_on_validate_credentials(self):
             self.selenium.find_element(*self._validate_credentials_button_locator).click()
 
