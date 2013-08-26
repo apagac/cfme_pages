@@ -24,6 +24,9 @@ class RedhatUpdates(Base):
     _password_locator = (By.CSS_SELECTOR, "input#customer_password")
     _save_button_locator = (By.CSS_SELECTOR, "img[title='Save Changes']")
     _cancel_button_locator = (By.CSS_SELECTOR, "img[title='Cancel']")
+    #LOCATORS FOR EDITED REGISTRATION
+    #TODO
+    _cfme_version_locator = ()
 
     def select_service(self, service):
         if service == "rhsm":
@@ -66,6 +69,13 @@ class RedhatUpdates(Base):
         self.selenium.find_element(*self._cancel_button_locator).click()
         self._wait_for_results_refresh()
         return RedhatUpdates.Cancelled(self.testsetup)
+
+    #TODO to compare appliance versions against cfme_data info
+    #needs to change.
+    def compare_versions(self, version_from_cfme_data):
+        #TODO
+        version_from_page = *self._cfme_version_locator.text()
+        return version_from_page == version_from_cfme_data
 
     class HTTPProxy(Base):
         _address_locator = ()
