@@ -46,10 +46,9 @@ class RedhatUpdates(Base):
         #fill data
         self.fill_field_by_locator(url, \
           *self._address_locator)
-        creds = self.testsetup.credentials[credentials]
-        self.fill_field_by_locator(creds["username"], \
+        self.fill_field_by_locator(credentials["username"], \
           *self._login_locator)
-        self.fill_field_by_locator(creds["password"], \
+        self.fill_field_by_locator(credentials["password"], \
           *self._password_locator)
 
     def edit_registration_and_save(self, url, credentials):
