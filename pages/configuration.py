@@ -12,7 +12,9 @@ from pages.configuration_subpages.settings import Settings
 from pages.configuration_subpages.tasks_tabs import Tasks
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
-from pages.configuration_subpages.settings_subpages.region_subpages.redhat_updates import RedhatUpdates
+
+#from pages.configuration_subpages.settings_subpages.region_subpages.redhat_updates import RedhatUpdates
+from pages.configuration_subpages.settings_subpages.redhat_updates import RedhatUpdates
 
 
 class Configuration(Base):
@@ -40,7 +42,8 @@ class Configuration(Base):
         @property
         def accordion(self):
             from pages.regions.accordion import Accordion
-            return Accordion(self.testsetup)
+            from pages.regions.treeaccordionitem import LegacyTreeAccordionItem
+            return Accordion(self.testsetup, LegacyTreeAccordionItem)
 
         @property
         def automation_engine_checkbox(self):
@@ -70,6 +73,8 @@ class Configuration(Base):
             return Settings(self.testsetup)
 
         def click_on_redhat_updates(self):
+            self.accordion.current_content.click()
+            self._wait_for_results_refresh()
             self.tabbutton_region.tabbutton_by_name("Red Hat Updates").click()
             self._wait_for_results_refresh()
             return RedhatUpdates(self.testsetup)
