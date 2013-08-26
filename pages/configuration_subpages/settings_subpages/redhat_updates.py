@@ -25,43 +25,43 @@ class RedhatUpdates(Base):
     _save_button_locator = (By.CSS_SELECTOR, "img[title='Save Changes']")
     _cancel_button_locator = (By.CSS_SELECTOR, "img[title='Cancel']")
 
-    def select_service(self, services):
-        if services == "rhsm":
+    def select_service(self, service):
+        if service == "rhsm":
             self.select_dropdown("Red Hat Subscription Management", \
               *self._register_with_locator)
-        elif services == "sat5":
+        elif service == "sat5":
             self.select_dropdown("RHN Satellite v5", \
               *self._register_with_locator)
-        elif services == "sat6":
+        elif service == "sat6":
             self.select_dropdown("RHN Satellite v6", \
               *self._register_with_locator)
         self._wait_for_results_refresh()
 
-    def edit_registration(self, services, **rh_updates_data):
+    def edit_registration(self, url, credentials):
         #click on edit registration
         self.selenium.find_element(*self._edit_registration_button_locator).click()
         self._wait_for_results_refresh()
         #register with provider
-        self.select_service(services)
+        self.select_service(credentials)
         #fill data
-        self.fill_field_by_locator(rh_updates_data["url"], \
+        self.fill_field_by_locator(url, \
           *self._address_locator)
-        credentials = self.testsetup.credentials[services]
-        self.fill_field_by_locator(credentials["username"], \
+        creds = self.testsetup.credentials[credentials]
+        self.fill_field_by_locator(creds["username"], \
           *self._login_locator)
-        self.fill_field_by_locator(credentials["password"], \
+        self.fill_field_by_locator(creds["password"], \
           *self._password_locator)
 
-    def edit_registration_and_save(self, services, **rh_updates_data):
-        self.edit_registration(services, **rh_updates_data)
+    def edit_registration_and_save(self, url, credentials):
+        self.edit_registration(url, credentials)
         self._wait_for_visible_element(*self._save_button_locator)
         #click on save
         self.selenium.find_element(*self._save_button_locator).click()
         self._wait_for_results_refresh()
         return RedhatUpdates.Registered(self.testsetup)
 
-    def edit_registration_and_cancel(self, services, **rh_updates_data):
-        self.edit_registration(services, **rh_updates_data)
+    def edit_registration_and_cancel(self, url, credentials):
+        self.edit_registration(url, credentials)
         self._wait_for_visible_element(*self._cancel_button_locator)
         #click on cancel
         self.selenium.find_element(*self._cancel_button_locator).click()

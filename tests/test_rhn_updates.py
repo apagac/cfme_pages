@@ -19,6 +19,6 @@ class TestUpdates:
         #updates_data = cfme_data.data["redhat_updates"]["rhsm"]
         updates_data = self.update_methods(services, cfme_data)
         updates_pg = cnf_configuration_pg.click_on_redhat_updates()
-        cancelled_pg = updates_pg.edit_registration_and_cancel(services, **updates_data)
+        cancelled_pg = updates_pg.edit_registration_and_cancel(**updates_data)
         flash_message = "Edit of Customer Information was cancelled"
         Assert.equal(cancelled_pg.flash.message, flash_message, cancelled_pg.flash.message)
