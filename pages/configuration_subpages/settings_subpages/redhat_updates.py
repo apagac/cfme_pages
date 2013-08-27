@@ -2,20 +2,6 @@ from pages.base import Base
 from selenium.webdriver.common.by import By
 
 class RedhatUpdates(Base):
-    #_edit_registration_button_locator = (By.CSS_SELECTOR, \
-    #    "")
-    #_http_proxy_locator = ()
-
-    def click_on_edit_registration(self):
-        self.selenium.find_element(*self._edit_registration_button_locator).click()
-        self._wait_for_results_refresh()
-        return RedhatUpdates.EditRegistration(self.testsetup)
-
-    def click_on_http_proxy(self):
-        self.selenium.find_element(*self._http_proxy_locator).click()
-        return RedhatUpdates.HTTPProxy(self.testsetup)
-
-    #LOCATORS
     _edit_registration_button_locator = (By.CSS_SELECTOR, \
       "button#settings_rhn_edit")
     _register_with_locator = (By.CSS_SELECTOR, "select#register_to")
@@ -24,9 +10,11 @@ class RedhatUpdates(Base):
     _password_locator = (By.CSS_SELECTOR, "input#customer_password")
     _save_button_locator = (By.CSS_SELECTOR, "img[title='Save Changes']")
     _cancel_button_locator = (By.CSS_SELECTOR, "img[title='Cancel']")
-    #LOCATORS FOR EDITED REGISTRATION
-    #TODO
-    _cfme_version_locator = ()
+
+    _cfme_version_locator = (By.CSS_SELECTOR, "div#form_div > table > tbody \
+       > tr:nth-of-type(2) > td:nth-of-type(6)")
+    _appliance_checkbox_locator = (By.CSS_SELECTOR, "input#listcheckbox")
+    _apply_cfme_updates_button = (By.CSS_SELECTOR, "button#rhn_update_button_on_1")
 
     def select_service(self, service):
         if service == "rhsm":
@@ -70,28 +58,17 @@ class RedhatUpdates(Base):
         self._wait_for_results_refresh()
         return RedhatUpdates.Cancelled(self.testsetup)
 
-    #TODO to compare appliance versions against cfme_data info
-    #needs to change.
+    #TODO needs to change.
     def compare_versions(self, version_from_cfme_data):
-        #TODO
-        version_from_page = *self._cfme_version_locator.text()
+        version_from_page = self.selenium.find_element(*self._cfme_version_locator).text
+        #here we can use compare version function from rpm package
         return version_from_page == version_from_cfme_data
 
-    class HTTPProxy(Base):
-        _address_locator = ()
-        _user_id_locator = ()
-        _password_locator = ()
-
-        def fill_data(self, rh_updates_data):
-            #address
-            self.selenium.find_element(*self._address_locator).send_keys(
-                rh_updates_data["http_proxy"]["url"])
-            #user id
-            self.selenium.find_element(*self._user_id_locator).send_keys(
-                rh_updates_data["http_proxy"]["username"])
-            #password
-            self.selenium.find_element(*self._password_locator).send_keys(
-                rh_updates_data["http_proxy"]["password"])
+    def apply_updates(self):
+        self.selenium.find_element(*self._appliance_checkbox_locator).click()
+        self._wait_for_visible_element(*self._apply_cfme_updates_button)
+        self.selenium.find_element(*self._apply_cfme_updates_button).click()
+        self._wait_for_results_refresh()
 
     class Registered(Base):
         _refresh_list_button_locator = ()

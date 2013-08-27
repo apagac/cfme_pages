@@ -42,9 +42,15 @@ class TestDestructiveUpdates:
     def test_compare_versions(self, cnf_configuration_pg, cfme_data):
         Assert.true(cnf_configuration_pg.is_the_current_page)
         updates_pg = cnf_configuration_pg.click_on_redhat_updates()
+        version_from_cfme_data = cfme_data.data["redhat_updates"]["current_version"]
         error_message = "Appliance versions are not the same"
-        Assert.true(updates_pg.compare_versions, error_message)
+        Assert.true(updates_pg.compare_versions(version_from_cfme_data), error_message)
 
     #TODO destructive, move to cfme_tests
-    def test_apply_updates(self):
-        pass
+    def test_initiate_updates(self, cnf_configuration_pg):
+        Assert.true(cnf_configuration_pg.is_the_current_page)
+        updates_pg = cnf_configuration_pg.click_on_redhat_updates()
+        updates_pg.apply_updates()
+        flash_message = "Update has been initiated for the selected Servers"
+        Assert.equal(updates_pg.flash.message, flash_message, updates_pg.flash.message)
+
