@@ -33,8 +33,9 @@ When adding a new page, there are a couple of places that need to be updated. On
 
 Prerequisites:
 
-1. Fedora system. Tested on F17 and F18.
-2. Cloned repository cfme_pages.
+1. Python 2.7
+1. Fedora system. Tested on F17, F18, and F19.
+1. Cloned repository cfme_pages.
    * Make yourself a new folder, then cd to it
    * git clone https://github.com/RedHatQE/cfme_pages.git
    * Alternatively, you can clone it from your own forked repo.
@@ -46,32 +47,32 @@ Setup:
    * cp cfme_pages/credentials.yaml.template .
    * cp cfme_pages/mozwebqa.cfg.template .
    * cp cfme_pages/pytest.ini.template .
-2. Rename all the files.
+1. Rename all the files.
    * mv credentials.yaml.template credentials.yaml
    * mv mozwebqa.cfg.template mozwebqa.cfg
    * mv pytest.ini.template pytest.ini
-3. Edit both files to reflect your environment.
+1. Edit both files to reflect your environment.
    * In credentials.yaml:
       + username: Your username, used to log in into cfme.
       + password: Your password, used to log in into cfme.
    * In mozwebqa.cfg:
       + baseurl: Url, where to find running version of cfme.
-4. Create a virtualenv to run pytest from
+1. Create a virtualenv to run pytest from
    * easy_install virtualenv (yum install python-virtualenv also works for those preferring rpm)
    * virtualenv [name]
    * source [name]/bin/activate 
-5. Install all required additional software.
+1. Install all required additional software.
    * List of required items is here: cfme_pages/requirements.txt
    * pip install -Ur cfme_pages/requirements.txt
    * pip install -Ur cfme_tests/requirements.txt (check for error output)
        + you may need to 'yum install libxslt-devel libxml2-devel' before hand 
-6. Install chromedriver (or you could just use firefox instead - replace "--driver=chrome" with "--driver=firefox" in pytest.ini).
+1. Install chromedriver (or you could just use firefox instead - replace "--driver=chrome" with "--driver=firefox" in pytest.ini).
    * Download latest available for your arch from here: http://code.google.com/p/chromedriver/downloads/list
    * Unzip the file to somewhere on your path (for example to '/usr/bin/chromedriver')
-7. Run the tests.
+1. Run the tests.
    * cd cfme_pages/
    * py.test
-8. TIP: to run specific test, add to this command '-k StringInTestName'
+1. TIP: to run specific test, add to this command '-k StringInTestName'
 
 Reminders:
 
