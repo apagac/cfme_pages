@@ -38,13 +38,24 @@ class TestDestructiveUpdates:
         flash_message = "Customer Information successfully saved"
         Assert.equal(registered_pg.flash.message, flash_message, registered_pg.flash.message)
 
+    def get_appliance_versions(self, cfme_data):
+        return cfme_data.data["redhat_updates"]["appliances"]
+
+    def get_appliance_current_version(self, cfme_data):
+        return cfme_data.data["redhat_updates"]["current_version"]
+
     #TODO to run after destructive, move to cfme_tests
     def test_compare_versions(self, cnf_configuration_pg, cfme_data):
         Assert.true(cnf_configuration_pg.is_the_current_page)
         updates_pg = cnf_configuration_pg.click_on_redhat_updates()
-        version_from_cfme_data = cfme_data.data["redhat_updates"]["current_version"]
-        error_message = "Appliance versions are not the same"
-        Assert.true(updates_pg.compare_versions(version_from_cfme_data), error_message)
+        #apps = updates_pg.all_appliances
+        #app = apps[0]
+        #message = "last_checked: " + app.last_checked + "\n" + \
+        #        "version: " + app.version + "\n" + \
+        #        "updates: " + str(app.updates_available) + "\n"
+        #Assert.equal(updates_pg.is_current_version_after_update, True, message)
+        ver = updates_pg.is_current_version_after_update(self.get_appliance_current_version(cfme_data))
+        Assert.true(2 == 3, ver)
 
     #TODO destructive, move to cfme_tests
     def test_initiate_updates(self, cnf_configuration_pg):
