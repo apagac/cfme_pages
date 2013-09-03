@@ -19,10 +19,6 @@ class RedhatUpdates(Base):
     _appliance_checkbox_locator = (By.CSS_SELECTOR, "input#listcheckbox")
     _apply_cfme_updates_button = (By.CSS_SELECTOR, "button#rhn_update_button_on_1")
 
-    #def __init__(self, testsetup, item_class = RedhatUpdates.ApplianceItem):
-    #    Page.__init__(self, testsetup)
-    #    self.item_class = item_class
-
     def select_service(self, service):
         if service == "rhsm":
             self.select_dropdown("Red Hat Subscription Management", \
@@ -65,29 +61,20 @@ class RedhatUpdates(Base):
         self._wait_for_results_refresh()
         return RedhatUpdates.Cancelled(self.testsetup)
 
-    #def get_appliance_versions(self, cfme_data):
-    #    return cfme_data.data["redhat_updates"]["appliances"]
-
-    #def get_appliance_current_version(self):
-    #    return cfme_data.data["redhat_updates"]["current_version"]
-
     @property
     def all_appliances(self):
-        #return [self.item_class(self.testsetup, appliance)
         return [RedhatUpdates.ApplianceItem(self.testsetup, appliance)
                 for appliance in self.selenium.find_elements(*self._all_appliances_locator)]
 
-    def are_old_versions_before_update(self):
-        #cfme_data
-        #versions_from_cfme_data = self.get_appliance_versions()
-        #for appliance in self.all_appliances:
-        #version_from_page = self.selenium.find_element(*self._cfme_version_locator).text
-        #here we can use compare version function from rpm package
-        #return version_from_page == version_from_cfme_data
-        pass
+    def are_old_versions_before_update(self, old_versions):
+        for appliance in self.all_appliances:
+            for appliance_from_cfme_data in old_versions:
+                if appliance.name == old_versions[appliance_from_cfme_data]['name']:
+                    if appliance.version != old_versions[appliance_from_cfme_data]['version']:
+                        return False
+        return True
 
     def is_current_version_after_update(self, current_version):
-        #current_version_from_cfme_data = self.get_appliance_current_version()
         for appliance in self.all_appliances:
             if appliance.version != current_version:
                 return False
@@ -100,38 +87,39 @@ class RedhatUpdates(Base):
         self._wait_for_results_refresh()
 
     class ApplianceItem(Base):
-        #_name_locator = (By.CSS_SELECTOR, "td:nth-of-type(2)")
-        #_zone_locator = (By.CSS_SELECTOR, "td:nth-of-type(3)")
-        #_status_locator = (By.CSS_SELECTOR, "td:nth-of-type(4)")
+        _name_locator = (By.CSS_SELECTOR, "td:nth-of-type(2)")
+        _zone_locator = (By.CSS_SELECTOR, "td:nth-of-type(3)")
+        _status_locator = (By.CSS_SELECTOR, "td:nth-of-type(4)")
         _last_checked_locator = (By.CSS_SELECTOR, "td:nth-of-type(5)")
         _version_locator = (By.CSS_SELECTOR, "td:nth-of-type(6)")
         _updates_available_locator = (By.CSS_SELECTOR, "td:nth-of-type(7)")
 
 
-        #@property
-        #def name(self):
-        #    return self.selenium.find_element(*self._name_locator).text
+        @property
+        def name(self):
+            return self._root_element.find_element(*self._name_locator).text
 
-        #@property
-        #def zone(self):
-        #    return self.selenium.find_element(*self._zone_locator).text
+        @property
+        def zone(self):
+            return self._root_element.find_element(*self._zone_locator).text
 
-        #@property
-        #def status(self):
-        #    return self.selenium.find_element(*self._status_locator).text
+        @property
+        def status(self):
+            return self._root_element.find_element(*self._status_locator).text
 
         @property
         def last_checked(self):
-            return self.selenium.find_element(*self._last_checked_locator).text
+            return self._root_element.find_element(*self._last_checked_locator).text
 
         @property
         def version(self):
-            return self.selenium.find_element(*self._version_locator).text
+            return self._root_element.find_element(*self._version_locator).text
 
         @property
         def updates_available(self):
-            return self.selenium.find_element(*self._updates_available_locator).text \
+            return self._root_element.find_element(*self._updates_available_locator).text \
                     == "Yes"
+
 
     class Registered(Base):
         _refresh_list_button_locator = ()

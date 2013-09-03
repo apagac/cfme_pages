@@ -38,26 +38,27 @@ class TestDestructiveUpdates:
         flash_message = "Customer Information successfully saved"
         Assert.equal(registered_pg.flash.message, flash_message, registered_pg.flash.message)
 
+@pytest.mark.nondestructive
+@pytest.mark.usefixtures("maximized")
+class TestWorkflow:
+    #Workflow:
+    #
+    # check cfme versions against the ones in cfme_data file
+    # initiate the update
+    # check cfme versions against the current one in cfme_data file
     def get_appliance_versions(self, cfme_data):
         return cfme_data.data["redhat_updates"]["appliances"]
 
     def get_appliance_current_version(self, cfme_data):
         return cfme_data.data["redhat_updates"]["current_version"]
 
-    #TODO to run after destructive, move to cfme_tests
-    def test_compare_versions(self, cnf_configuration_pg, cfme_data):
+    def test_compare_versions_before_update(self, cnf_configuration_pg, cfme_data):
         Assert.true(cnf_configuration_pg.is_the_current_page)
         updates_pg = cnf_configuration_pg.click_on_redhat_updates()
-        #apps = updates_pg.all_appliances
-        #app = apps[0]
-        #message = "last_checked: " + app.last_checked + "\n" + \
-        #        "version: " + app.version + "\n" + \
-        #        "updates: " + str(app.updates_available) + "\n"
-        #Assert.equal(updates_pg.is_current_version_after_update, True, message)
-        ver = updates_pg.is_current_version_after_update(self.get_appliance_current_version(cfme_data))
-        Assert.true(2 == 3, ver)
+        Assert.true(updates_pg.are_old_versions_before_update(
+                self.get_appliance_versions(cfme_data)))
 
-    #TODO destructive, move to cfme_tests
+    #TODO now works only for the first appliance in list
     def test_initiate_updates(self, cnf_configuration_pg):
         Assert.true(cnf_configuration_pg.is_the_current_page)
         updates_pg = cnf_configuration_pg.click_on_redhat_updates()
@@ -65,3 +66,8 @@ class TestDestructiveUpdates:
         flash_message = "Update has been initiated for the selected Servers"
         Assert.equal(updates_pg.flash.message, flash_message, updates_pg.flash.message)
 
+    def test_compare_versions_after_update(self, cnf_configuration_pg, cfme_data):
+        Assert.true(cnf_configuration_pg.is_the_current_page)
+        updates_pg = cnf_configuration_pg.click_on_redhat_updates()
+        Assert.true(updates_pg.is_current_version_after_update(
+                self.get_appliance_current_version(cfme_data)))
