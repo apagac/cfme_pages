@@ -81,12 +81,14 @@ class RedhatUpdates(Base):
         return True
 
     def apply_updates(self):
-        self.selenium.find_element(*self._appliance_checkbox_locator).click()
+        for appliance in self.all_appliances:
+            appliance.checkbox.click()
         self._wait_for_visible_element(*self._apply_cfme_updates_button)
         self.selenium.find_element(*self._apply_cfme_updates_button).click()
         self._wait_for_results_refresh()
 
     class ApplianceItem(Base):
+        _checkbox_locator = (By.CSS_SELECTOR, "td:nth-of-type(1) > input")
         _name_locator = (By.CSS_SELECTOR, "td:nth-of-type(2)")
         _zone_locator = (By.CSS_SELECTOR, "td:nth-of-type(3)")
         _status_locator = (By.CSS_SELECTOR, "td:nth-of-type(4)")
@@ -94,6 +96,9 @@ class RedhatUpdates(Base):
         _version_locator = (By.CSS_SELECTOR, "td:nth-of-type(6)")
         _updates_available_locator = (By.CSS_SELECTOR, "td:nth-of-type(7)")
 
+        @property
+        def checkbox(self):
+            return self._root_element.find_element(*self._checkbox_locator)
 
         @property
         def name(self):

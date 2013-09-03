@@ -58,7 +58,6 @@ class TestWorkflow:
         Assert.true(updates_pg.are_old_versions_before_update(
                 self.get_appliance_versions(cfme_data)))
 
-    #TODO now works only for the first appliance in list
     def test_initiate_updates(self, cnf_configuration_pg):
         Assert.true(cnf_configuration_pg.is_the_current_page)
         updates_pg = cnf_configuration_pg.click_on_redhat_updates()
