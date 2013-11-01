@@ -1,6 +1,8 @@
 from pages.base import Base
 from selenium.webdriver.common.by import By
 
+#TODO look at smyers notes from last PR
+
 class RedhatUpdates(Base):
     _edit_registration_button_locator = (By.CSS_SELECTOR,
         "button#settings_rhn_edit")
@@ -33,11 +35,15 @@ class RedhatUpdates(Base):
                 *self._register_with_locator)
         self._wait_for_results_refresh()
 
+    #TODO add organisation choosing with sat5
     def edit_registration(self, url, credentials, service, proxy=False):
         #click on edit registration
         self.selenium.find_element(*self._edit_registration_button_locator).click()
         self._wait_for_results_refresh()
         #register with provider
+        #TODO return service selected
+        #TODO then specific filling method
+        #TODO make a note in cfme_data on only using values rhsm|sat5|sat6
         self.select_service(service)
         #fill data
         self.fill_field_by_locator(url, *self._address_locator)
@@ -55,6 +61,7 @@ class RedhatUpdates(Base):
     def edit_registration_and_save(self, url, credentials, service, proxy=False, default=False):
         self.edit_registration(url, credentials, service, proxy)
         #workaround for save button to display
+        #TODO 'default' button is not there when registering with sat5&sat6
         if default:
             self.selenium.find_element(*self._default_button_locator).click()
             self._wait_for_results_refresh()
@@ -78,6 +85,7 @@ class RedhatUpdates(Base):
             for appliance in self.selenium.find_elements(
                 *self._all_appliances_locator)]
 
+    #TODO are_registered (rename)
     def is_registered(self, appliances):
         ok_flag = False
         for appliance in appliances:
