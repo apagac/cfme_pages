@@ -10,6 +10,7 @@ class RedhatUpdates(Base):
     _address_locator = (By.CSS_SELECTOR, "input#server_url")
     _login_locator = (By.CSS_SELECTOR, "input#customer_userid")
     _password_locator = (By.CSS_SELECTOR, "input#customer_password")
+    _organization_locator = (By.CSS_SELECTOR, "input#customer_org")
     _save_button_locator = (By.CSS_SELECTOR, "img[title='Save Changes']")
     _cancel_button_locator = (By.CSS_SELECTOR, "img[title='Cancel']")
     _default_button_locator = (By.CSS_SELECTOR, "button#rhn_default_button")
@@ -23,7 +24,8 @@ class RedhatUpdates(Base):
     _register_button_locator = (By.CSS_SELECTOR, "button#rhn_register_button_on_1")
     _refresh_button_locator = (By.CSS_SELECTOR, "button#rhn_refresh_button")
 
-    def select_service(self, service):
+    #TODO DELETE - NOT USED ANY MORE
+    def select_service_OLD(self, service):
         if service == "rhsm":
             self.select_dropdown("Red Hat Subscription Management",
                 *self._register_with_locator)
@@ -35,15 +37,45 @@ class RedhatUpdates(Base):
                 *self._register_with_locator)
         self._wait_for_results_refresh()
 
-    #TODO add organisation choosing with sat5
-    def edit_registration(self, url, credentials, service, proxy=False):
+    def fill_user_pass_url(self, url, credentials):
+        self.fill_field_by_locator(url, *self._address_locator)
+        self.fill_field_by_locator(credentials["username"],
+            *self._login_locator)
+        self.fill_field_by_locator(credentials["password"],
+            *self._password_locator)
+
+    def edit_registration(self, url, credentials, service, organization, proxy):
+        self.selenium.find_element(*self._edit_registration_button_locator).click()
+        self._wait_for_results_refresh()
+        if service == "rhsm":
+            self.select_dropdown("Red Hat Subscription Management",
+                *self._register_with_locator)
+            self.fill_user_pass_url(url, credentials)
+        elif service == "sat5":
+            self.select_dropdown("RHN Satellite v5",
+                *self._register_with_locator)
+            self.fill_user_pass_url(url, credentials)
+            #TODO add organization to cfme_data and remove one from sat6
+            self.fill_field_by_locator(organization, *self._organization_locator)
+        #TODO make a note in cfme_data on only using values rhsm|sat5|sat6
+        elif service == "sat6":
+            self.select_dropdown("RHN Satellite v6",
+                *self._register_with_locator)
+            self.fill_user_pass_url(url, credentials)
+        #TODO else: pytest.fail with bad option in cfme data
+        if proxy:
+            self._wait_for_results_refresh()
+            self.selenium.find_element(*self._proxy_checkbox_locator).click()
+            self._wait_for_results_refresh()
+            self.fill_field_by_locator(proxy["url"],
+                *self._proxy_address_locator)
+
+    #TODO DELETE - NOT USED ANY MORE
+    def edit_registration_OLD(self, url, credentials, service, proxy=False):
         #click on edit registration
         self.selenium.find_element(*self._edit_registration_button_locator).click()
         self._wait_for_results_refresh()
         #register with provider
-        #TODO return service selected
-        #TODO then specific filling method
-        #TODO make a note in cfme_data on only using values rhsm|sat5|sat6
         self.select_service(service)
         #fill data
         self.fill_field_by_locator(url, *self._address_locator)
@@ -58,8 +90,9 @@ class RedhatUpdates(Base):
             self.fill_field_by_locator(proxy["url"],
                 *self._proxy_address_locator)
 
-    def edit_registration_and_save(self, url, credentials, service, proxy=False, default=False):
-        self.edit_registration(url, credentials, service, proxy)
+    def edit_registration_and_save(self, url, credentials, service, organization=None,
+        proxy=False, default=False):
+        self.edit_registration(url, credentials, service, organization, proxy)
         #workaround for save button to display
         #TODO 'default' button is not there when registering with sat5&sat6
         if default:
@@ -86,16 +119,27 @@ class RedhatUpdates(Base):
                 *self._all_appliances_locator)]
 
     #TODO are_registered (rename)
-    def is_registered(self, appliances):
+    #TODO default parameter for all appliances (possibly appliances=False)
+    def is_registered(self, appliances=False):
         ok_flag = False
-        for appliance in appliances:
+        if appliances:
+            for appliance in appliances:
+                for appliance_from_list in self.appliance_list:
+                    if appliance == appliance_from_list.name:
+                        #if appliance_from_list.status == "Subscribed" \
+                        #    or appliance_from_list.status == "Unsubscribed":
+                        if appliance_from_list.status in \
+                            ('Subscribed', 'Unsubscribed'):
+                            ok_flag = True
+                        else:
+                            ok_flag = False
+        else:
             for appliance_from_list in self.appliance_list:
-                if appliance == appliance_from_list.name:
-                    if appliance_from_list.status == "Subscribed" \
-                        or appliance_from_list.status == "Unsubscribed":
-                        ok_flag = True
-                    else:
-                        ok_flag = False
+                if appliance_from_list.status in \
+                    ('Subscribed', 'Unsubscribed'):
+                    ok_flag = True
+                else:
+                    ok_flag = False
         if ok_flag:
             return True
         return False
@@ -114,11 +158,15 @@ class RedhatUpdates(Base):
                 return False
         return True
 
-    def register_appliances(self, appliances_to_register):
-        for appliance in self.appliance_list:
-            for appliance_to_register in appliances_to_register:
-                if appliance.name == appliance_to_register:
-                    appliance.checkbox.click()
+    def register_appliances(self, appliances_to_register=False):
+        if appliances_to_register:
+            for appliance in self.appliance_list:
+                for appliance_to_register in appliances_to_register:
+                    if appliance.name == appliance_to_register:
+                        appliance.checkbox.click()
+        else:
+            for appliance in self.appliance_list:
+                appliance.checkbox.click()
         self._wait_for_visible_element(*self._register_button_locator)
         self.selenium.find_element(*self._register_button_locator).click()
         self._wait_for_results_refresh()
