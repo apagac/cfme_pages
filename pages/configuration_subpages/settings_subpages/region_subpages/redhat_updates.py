@@ -4,6 +4,7 @@ from selenium.webdriver.common.by import By
 #TODO look at smyers notes from last PR
 
 class RedhatUpdates(Base):
+    _page_title = "CloudForms Management Engine: Configuration"
     _edit_registration_button_locator = (By.CSS_SELECTOR,
         "button#settings_rhn_edit")
     _register_with_locator = (By.CSS_SELECTOR, "select#register_to")
@@ -14,28 +15,14 @@ class RedhatUpdates(Base):
     _save_button_locator = (By.CSS_SELECTOR, "img[title='Save Changes']")
     _cancel_button_locator = (By.CSS_SELECTOR, "img[title='Cancel']")
     _default_button_locator = (By.CSS_SELECTOR, "button#rhn_default_button")
-
     _proxy_checkbox_locator = (By.CSS_SELECTOR, "input#use_proxy")
     _proxy_address_locator = (By.CSS_SELECTOR, "input#proxy_address")
-    _all_appliances_locator = (By.CSS_SELECTOR, "div#form_div > table > tbody \
-            > tr")
+    _all_appliances_locator = (By.CSS_SELECTOR, "div#form_div > table > tbody > tr")
     _appliance_checkbox_locator = (By.CSS_SELECTOR, "input#listcheckbox")
     _apply_cfme_updates_button = (By.CSS_SELECTOR, "button#rhn_update_button_on_1")
     _register_button_locator = (By.CSS_SELECTOR, "button#rhn_register_button_on_1")
     _refresh_button_locator = (By.CSS_SELECTOR, "button#rhn_refresh_button")
-
-    #TODO DELETE - NOT USED ANY MORE
-    def select_service_OLD(self, service):
-        if service == "rhsm":
-            self.select_dropdown("Red Hat Subscription Management",
-                *self._register_with_locator)
-        elif service == "sat5":
-            self.select_dropdown("RHN Satellite v5",
-                *self._register_with_locator)
-        elif service == "sat6":
-            self.select_dropdown("RHN Satellite v6",
-                *self._register_with_locator)
-        self._wait_for_results_refresh()
+    _check_for_updates_button_locator = (By.CSS_SELECTOR, "button#rhn_check_updates_button_on_1")
 
     def fill_user_pass_url(self, url, credentials):
         self.fill_field_by_locator(url, *self._address_locator)
@@ -55,34 +42,12 @@ class RedhatUpdates(Base):
             self.select_dropdown("RHN Satellite v5",
                 *self._register_with_locator)
             self.fill_user_pass_url(url, credentials)
-            #TODO add organization to cfme_data and remove one from sat6
             self.fill_field_by_locator(organization, *self._organization_locator)
-        #TODO make a note in cfme_data on only using values rhsm|sat5|sat6
         elif service == "sat6":
             self.select_dropdown("RHN Satellite v6",
                 *self._register_with_locator)
             self.fill_user_pass_url(url, credentials)
-        #TODO else: pytest.fail with bad option in cfme data
-        if proxy:
-            self._wait_for_results_refresh()
-            self.selenium.find_element(*self._proxy_checkbox_locator).click()
-            self._wait_for_results_refresh()
-            self.fill_field_by_locator(proxy["url"],
-                *self._proxy_address_locator)
-
-    #TODO DELETE - NOT USED ANY MORE
-    def edit_registration_OLD(self, url, credentials, service, proxy=False):
-        #click on edit registration
-        self.selenium.find_element(*self._edit_registration_button_locator).click()
-        self._wait_for_results_refresh()
-        #register with provider
-        self.select_service(service)
-        #fill data
-        self.fill_field_by_locator(url, *self._address_locator)
-        self.fill_field_by_locator(credentials["username"],
-            *self._login_locator)
-        self.fill_field_by_locator(credentials["password"],
-            *self._password_locator)
+        #TODO check if this works
         if proxy:
             self._wait_for_results_refresh()
             self.selenium.find_element(*self._proxy_checkbox_locator).click()
@@ -93,8 +58,7 @@ class RedhatUpdates(Base):
     def edit_registration_and_save(self, url, credentials, service, organization=None,
         proxy=False, default=False):
         self.edit_registration(url, credentials, service, organization, proxy)
-        #workaround for save button to display
-        #TODO 'default' button is not there when registering with sat5&sat6
+        #Default available only when registering with rhsm
         if default:
             self.selenium.find_element(*self._default_button_locator).click()
             self._wait_for_results_refresh()
@@ -104,6 +68,8 @@ class RedhatUpdates(Base):
         self._wait_for_results_refresh()
         return RedhatUpdates.Registered(self.testsetup)
 
+    #TODO edit - too few arguments
+    #TODO edit relevant unit test - test_redhat_updates.py
     def edit_registration_and_cancel(self, url, credentials, service):
         self.edit_registration(url, credentials, service)
         self._wait_for_visible_element(*self._cancel_button_locator)
@@ -118,16 +84,13 @@ class RedhatUpdates(Base):
             for appliance in self.selenium.find_elements(
                 *self._all_appliances_locator)]
 
-    #TODO are_registered (rename)
-    #TODO default parameter for all appliances (possibly appliances=False)
-    def is_registered(self, appliances=False):
+    #TODO check the conditions, add ok_flag
+    def systems_registered(self, appliances=False):
         ok_flag = False
         if appliances:
             for appliance in appliances:
                 for appliance_from_list in self.appliance_list:
                     if appliance == appliance_from_list.name:
-                        #if appliance_from_list.status == "Subscribed" \
-                        #    or appliance_from_list.status == "Unsubscribed":
                         if appliance_from_list.status in \
                             ('Subscribed', 'Unsubscribed'):
                             ok_flag = True
@@ -144,20 +107,20 @@ class RedhatUpdates(Base):
             return True
         return False
 
-    def are_old_versions_before_update(self, old_versions):
-        for appliance in self.appliance_list:
-            for appliance_from_cfme_data in old_versions:
-                if appliance.name == appliance_from_cfme_data['name']:
-                    if appliance.version != appliance_from_cfme_data['version']:
-                        return False
+    def check_versions(self, appliance_data):
+        if type(appliance_data) is list:
+            for appliance in self.appliance_list:
+                for app_data in appliance_data:
+                    if appliance.name == app_data['name']:
+                        if appliance.version != app_data['version']:
+                            return False
+        else:
+            for appliance in self.appliance_list:
+                if appliance.version != appliance_data:
+                    return False
         return True
 
-    def is_current_version_after_update(self, current_version):
-        for appliance in self.appliance_list:
-            if appliance.version != current_version:
-                return False
-        return True
-
+    #TODO function for checking checkbox
     def register_appliances(self, appliances_to_register=False):
         if appliances_to_register:
             for appliance in self.appliance_list:
@@ -171,6 +134,7 @@ class RedhatUpdates(Base):
         self.selenium.find_element(*self._register_button_locator).click()
         self._wait_for_results_refresh()
 
+    #TODO in this workflow this is without default
     def apply_updates(self, appliances_to_update):
         for appliance in self.appliance_list:
             for appliance_to_update in appliances_to_update:
@@ -183,6 +147,34 @@ class RedhatUpdates(Base):
     def refresh_list(self):
         self.selenium.find_element(*self._refresh_button_locator).click()
         self._wait_for_results_refresh()
+
+    def platform_updates_available(self, appliances=False):
+        if appliances:
+            for app_from_list in appliances:
+                for appliance in self.appliance_list:
+                    if app_from_list['name'] == appliance.name:
+                        if appliance.updates_available:
+                            return True
+        else:
+            for appliance in self.appliance_list:
+                if appliance.updates_available:
+                    return True
+        return False
+
+    #TODO debug - function for checking checkboxes
+    #now it's unchecking every other time
+    def refresh_updates(self, appliances=False):
+        if appliances:
+            for app_from_list in appliances:
+                for appliance in self.appliance_list:
+                    if app_from_list['name'] == appliance.name:
+                        appliance.checkbox.click()
+        else:
+            for appliance in self.appliance_list:
+                appliance.checkbox.click()
+        self.selenium.find_element(*self._check_for_updates_button_locator).click()
+        self._wait_for_results_refresh()
+
 
     class ApplianceItem(Base):
         _checkbox_locator = (By.CSS_SELECTOR, "td:nth-of-type(1) > input")
