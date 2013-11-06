@@ -84,28 +84,24 @@ class RedhatUpdates(Base):
             for appliance in self.selenium.find_elements(
                 *self._all_appliances_locator)]
 
-    #TODO check the conditions, add ok_flag
     def systems_registered(self, appliances=False):
-        ok_flag = False
         if appliances:
             for appliance in appliances:
                 for appliance_from_list in self.appliance_list:
                     if appliance == appliance_from_list.name:
                         if appliance_from_list.status in \
                             ('Subscribed', 'Unsubscribed'):
-                            ok_flag = True
+                            pass
                         else:
-                            ok_flag = False
+                            return False
         else:
             for appliance_from_list in self.appliance_list:
                 if appliance_from_list.status in \
                     ('Subscribed', 'Unsubscribed'):
-                    ok_flag = True
+                    pass
                 else:
-                    ok_flag = False
-        if ok_flag:
-            return True
-        return False
+                    return False
+        return True
 
     def check_versions(self, appliance_data):
         if type(appliance_data) is list:
@@ -120,7 +116,6 @@ class RedhatUpdates(Base):
                     return False
         return True
 
-    #TODO function for checking checkbox
     def register_appliances(self, appliances_to_register=False):
         if appliances_to_register:
             for appliance in self.appliance_list:
@@ -161,20 +156,31 @@ class RedhatUpdates(Base):
                     return True
         return False
 
-    #TODO debug - function for checking checkboxes
-    #now it's unchecking every other time
-    def refresh_updates(self, appliances=False):
+    def refresh_updates(self, first_run, appliances=False):
+        if first_run:
+            if appliances:
+                for app_from_list in appliances:
+                    for appliance in self.appliance_list:
+                        if app_from_list['name'] == appliance.name:
+                            appliance.checkbox.click()
+            else:
+                for appliance in self.appliance_list:
+                    appliance.checkbox.click()
+        self.selenium.find_element(*self._check_for_updates_button_locator).click()
+        self._wait_for_results_refresh()
+
+    def platform_updates_checked(self, appliances=False):
         if appliances:
             for app_from_list in appliances:
                 for appliance in self.appliance_list:
                     if app_from_list['name'] == appliance.name:
-                        appliance.checkbox.click()
+                        if appliance.last_checked == '':
+                            return False
         else:
             for appliance in self.appliance_list:
-                appliance.checkbox.click()
-        self.selenium.find_element(*self._check_for_updates_button_locator).click()
-        self._wait_for_results_refresh()
-
+                if appliance.last_checked == '':
+                    return False
+        return True
 
     class ApplianceItem(Base):
         _checkbox_locator = (By.CSS_SELECTOR, "td:nth-of-type(1) > input")
